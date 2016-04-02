@@ -1,0 +1,122 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 01/08/2016
+Lab: 3
+TA: Lauren Samy
+
+*** Assignment 1 ***
+
+Laboratory Answers and Descriptions:
+
+1. The command "man -k <word>" can be used to find all commands that have a 
+specified word in their man page.
+In order to find this answer, I used the command "man man" to see the manual
+page for the "man" command. After scrolling down to the "options" section,
+I found that the "-k" option searches for a given keyword in the manual pages
+of commands, which gives the desired functionality.
+
+2. I used the command "which <command>" to find that the cp program is located 
+at the absolute path "/usr/local/cs/bin/cp", and the wc program is located at 
+the absolute path "/usr/local/cs/bin/wc". 
+In order to find this answer, I used the command "which <command>". The command 
+"man which" displayed the manual page for the "which" command, which explains 
+that it "shows the full path of (shell) commands", which is the desired 
+functionality.
+
+3. The executable program names that are one character long are ".", ":", "w", 
+and "[". 
+These programs were found by running the "find /usr/bin -name "?" -type f" to
+find commands that have 1 character. According to the manual and help pages 
+for each command, they do the following:
+".": "Execute commands from a file in the current shell." (Source: "help .")
+":": "No effect; the command does nothing" (Source: "help :")
+"w": "Show who is logged on and what they are doing." (Source: "man w")
+"[": "Evaluate conditional expression." (Source: "help [")
+
+4. The file /etc/alternatives/emacs is actually executed.
+In order to find this answer, I used the command "cd /usr/bin" to naviagte to
+the folder with the executable. Then I used the command "ls -l | grep emacs"
+to show that "emacs" links to the file /etc/alternatives/emacs. The manual page 
+for "grep" shows that it can be used to find lines in input that contain a 
+match for the given pattern, which is useful in this scenario.
+
+5. g+s causes the file group to "set user or group ID on execution" according
+to the chmod manual page. This would give the user who executes the file the
+same permissions as the group that owns the file. o-x removes execution 
+permission from users that do not own the file and who are not in the 
+file's group. 
+In order to find these answers, I used "man chmod" to access the chmod manual 
+pages in order to look up the permission commands and conventions.
+
+6. The option "-ctime -21" causes "find" to search for files that have been 
+modified in the last 3 weeks.
+In order to find this answer, I used "man find" to look up the manual pages
+for "find". Under the "TESTS" section, I found the "-ctime n" causes "find"
+to search for files that were changed less than n*24 hours ago. Therefore,
+in order to search for files the were modified within the last 3 weeks, "n"
+should be set to 21.
+
+7. To find all of the directories that were modified in the last 3 weeks, I ran
+the command "find / -type d -ctime -21".
+In order to find this answer, I used my answer to question 6, as well as the 
+manual page for the "find" command.
+
+8. Of the files in the same directory as "find", 287 are symbolic links.
+In order to find this answer, I first used "which find" to find the directory
+that "find" is in. Then I used the command "find /usr/bin/ -type l | wc" to 
+find the number of symbolic links. The options for "find" were found in the 
+manual pages for "find", and a description of the "wc" command was found in 
+the manual pages for "wc".
+
+9. The oldest regular file in the "/usr/lib" directory is "libfreeblpriv3.so".
+In order to find this, I first navigated to the folder by running "cd /usr/lib".
+Then I looked through the manual page for "ls" to find that the option "-lt" 
+sorts files by modification time. In order to only show regular files, I piped
+results to the command "grep ^-", which according to the "grep" manual page,
+prints lines that match the given regular expression. Therefore, running the
+command "ls -lt | grep ^-" listed the oldest file at the bottom of the output. 
+
+10. As specified in the "locale" manual pages, the "locale" command gets data 
+from the "Base Definitions volume of IEEE Std 1003.1-2001, Chapter 7, Locale."
+(Source: "locale" manual pages).
+
+11. In Emacs, the following commands have "sort" in their name:
+Buffer-menu-sort, sort-columns, sort-fields, sort-lines, sort-numeric-fields, 
+sort-pages, sort-regexp-fields, tabulated-list-col-sort, tabulated-list-sort
+In order to find this, I started Emacs with the command "emacs". Then I ran
+the command "C-h a sort" in order to search for commands that have the word
+"sort" in their name.
+
+12. According to the Emacs manual, the keystroke C-M-a (beginning-of-defun) 
+is a Lisp function that moves the cursor to the beginning of the specified 
+defun. The keystroke C-M-h (mark-defun) is a Lisp function that marks the end 
+of the defun, and moves the cursor to the beginning.
+In order to find the descriptions of these commands, I first ran Emacs with the
+command "emacs". then I used the command "C-h b" to show the current 
+keybindings, and the command "C-x o" to switch buffers. Then I used 
+"C-s <command>" to find each command. By opening the corresponding manual 
+pages, I found what each command does.
+
+13. Based on the same process given in question 12, I found that the command
+"C-g" (keyboard-quit) is a Lisp function that causes the Lisp code to quit. This
+cancels any commands that were being entered.
+
+14. The Emacs command "yank" pastes the last "killed" section of text according 
+to the manual.
+In order to find this information, I used the command "C-h b" to show the 
+current keybindings. Then I used "C-x o" to switch buffers, and "C-s yank" to 
+search for the "yank" command. I opened the manual page for the command to find 
+more details about it.
+
+15. The main difference was that two lines appeared from the Emacs dired
+command, but not from the ls -l command.
+dr-xr-xr-x.   2 root root       77824 Dec 22 13:15 .
+drwxr-xr-x.  16 root root        4096 Dec 22 11:29 ..
+The "dired" command displays information about the current folder and the parent
+folder, while the "ls -l" command does not. Besides formatting "spacing, 
+colors, fonts, everything else was the same".
+In order to find this information, I first navigated to the correct folder by
+running the command "cd /usr/bin". Then I ran Emacs, and ran the "dired" command
+to get the output of file information. In the shell, I ran "ls -l" to also get
+file information. I compared the two outputs to find the differences that I
+described above.

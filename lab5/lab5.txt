@@ -1,0 +1,177 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 02/05/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 5 ***
+
+Laboratory Log:
+
+In order to begin the lab, I logged into a SEASnet server by using the
+following command:
+	ssh ozgur@lnxsrv09.seas.ucla.edu
+
+Afterwards, I downloaded the project files with the following command:
+	wget http://web.cs.ucla.edu/classes/winter16/cs35L/assign/\
+coreutils-with-bug.tar.gz
+
+Next, I unzipped the file using the following command:
+	tar -zxvf coreutils-with-bug.tar.gz
+
+In order to attempt to build the project, I used the following commands:
+	cd coreutils-with-bug/
+	./configure
+	make
+
+After running "make", an error showed that there was a conflicting function
+declarations. A portion of the output is shown below:
+	In file included from utimecmp.c:41:0:
+	utimens.h:2:5: error: conflicting types for 'futimens'
+	 int futimens (int, char const *, struct timespec const [2]);
+	     ^
+	In file included from utimecmp.h:25:0,
+	                 from utimecmp.c:25:
+	/usr/include/sys/stat.h:373:12: note: previous declaration of
+ 'futimens' was here
+	 extern int futimens (int __fd, const struct timespec __times[2])
+ __THROW;
+	            ^
+	Makefile:659: recipe for target 'utimecmp.o' failed
+
+In order to apply a patch that would fix this error, I first downloaded the
+patch file. Then I used the "cat" command to help see what the "-p" option
+for the "patch" command should be. Afterwards, I applied the patch. The
+commands that I used are shown below:
+	wget http://web.cs.ucla.edu/classes/winter16/cs35L/assign/\
+coreutils.diff
+	cat coreutils.diff
+	patch -p0 <coreutils.diff
+
+After applying the patch, I ran the command "make" to build the project without
+a failure.
+
+In order to reproduce the bug, I created 3 files in a new $tmp directory. One
+file was called "wwi-armistice", which was purposefully made to have a
+year of 1918, which was before the Unix Epoch. The other two files, "now" and
+"now1", were created within close time intervals. It is expected that the newer
+file, "now1", should be printed first according to sorted order. The commands
+that were used to create the files are listed below:
+	tmp=$(mktemp -d)
+	touch -d '1918-11-11 11:00 GMT' $tmp/wwi-armistice
+	touch $tmp/now
+	sleep 1
+	touch $tmp/now1
+
+In order to test the output of the built "ls" command in the "src" directory,
+I ran the following command:
+	TZ=UTC0 src/ls -lt --full-time $tmp/wwi-armistice $tmp/now $tmp/now1
+
+Running the command gave the following output, which is incorrect, since the
+file that was "made" a long time ago was listed first:
+	-rw-r--r-- 1 ozgur csugrad 0 1918-11-11 03:00:00.000000000 -0800 
+wwi-armistice
+	-rw-r--r-- 1 ozgur csugrad 0 2016-02-03 16:33:12.686847356 -0800 now1
+	-rw-r--r-- 1 ozgur csugrad 0 2016-02-03 16:32:46.965449582 -0800 now
+
+In order to debug the progrm, I used "cd" to enter the $tmp directory, and
+used "gdb" on the newly built version of "ls":
+	cd $tmp
+	gdb ~/cs35l/hw5/coreutils-with-bug/src/ls
+
+Afterwares, I inspected a list of functions by running "info functions". Manual
+inspection showed that the function "sort_files" was a likely source of the
+bug. Therefore, I ran "break sort_files" to create a breakpoint at the
+"sort_files" function.
+
+After creating the breakpoint, I ran the program with the following command:
+	run -lt --full-time wwi-armistice now now1
+
+Then I used the command "n" multiple times until I saw a call to the function
+"compare_mtime", which seemed to be related to the problem. Therefore, I
+ran "break compare_mtime" to create a breakpoint at the function, and I
+ran "continue" to continue execution until the "compare_mtime" was called.
+
+After the "compare_mtime" function was called, I ran "si" to "step into" the
+function call. This revealed the following lines:
+	timespec_cmp (b=..., a=...) at ../lib/timespec.h:49
+	49	  return diff ? diff : a.tv_nsec - b.tv_nsec;
+
+Based on this output, I realized that the sorting problem was likely due to
+code in the "timespec_cmp" function near line "49" of the "timespec.h"
+file in the "lib" folder of the project.
+
+In order to navigate to the "timespec_cmp" function, I ran the following
+commands:
+	cd coreutils-with-bug/lib
+	vim timepec.h
+
+After inspecting the "timespec_cmp" function, I found that the bug was due
+to possible overflow of the "diff" integer. By reading the description of
+the function, I found that the only requirement was to return a negative, 
+positive, or zero integer. Therefore, I replaced the function implementation
+by the code below, which returns 1, -1, or 0, which removes the possibilty
+of overflow giving the wrong results.
+  	if(a.tv_sec > b.tv_sec)
+        	return 1;
+  	else if(a.tv_sec < b.tv_sec)
+        	return -1;
+  	return 0;
+
+After modifying the "timespec.h" file, I navigated to the root of the project
+directory, and ran "make" to rebuild the project:
+	cd ..
+	make
+
+After re-running the built "ls" command with the following command, I found
+that the resulting output was in the correct order:
+	TZ=UTC0 src/ls -lt --full-time $tmp/wwi-armistice $tmp/now $tmp/now1
+
+In order to create the ChangeLog entry for the change, I ran the following
+commands:
+	emacs lib/timespec.h
+	C-x 4 a
+
+The message that I wrote in the ChangeLog was "timespec_cmp now returns -1,
+ 0, or 1 if A < B, A == B, or A > B repectively."
+
+After creating the ChangeLog entry, I navigated to the project's parent
+directory, renamed the project folder to "coreutils-with-bug-changed", and
+then re-downloaded the project to the foloder "coreutils-with-bug". This was
+done with the following commands:
+	cd ..
+	mv coreutils-with-bug coreutils-with-bug-changed
+	tar -zxvf coreutils-with-bug.tar.gz
+
+In order to create the patch file "lab5.diff", I ran the following command:
+	diff -u coreutils-with-bug/lib/timespec.h coreutils-with-bug-changed/\
+lib/timespec.h >lab5.diff
+
+Afterwards, I opened the ChangeLog file, and copied and pasted the newly
+created ChangeLog entry to the top of the file "lab5.diff".
+
+In order to reproduce the problem in the home directory of a SEASnet Linux
+server, I ran the following commands:
+	cd
+	touch -d '1918-11-11 11:00 GMT' wwi-armistice
+	touch now
+	sleep 1
+	touch now1
+	TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+
+This gave the following incorrect output:
+	-rw-r--r-- 1 ozgur csugrad 0 2054-12-17 17:28:16.000000000 +0000 
+wwi-armistice
+	-rw-r--r-- 1 ozgur csugrad 0 2016-02-04 04:32:46.984324000 +0000 now1
+	-rw-r--r-- 1 ozgur csugrad 0 2016-02-04 04:32:46.979329000 +0000 now
+
+The problem of the older file incorrectly having a date in the future is
+explained by the way that timestamps are interpretted on the SEASnet Linux
+NFS file system. The main problem is that the timestamps of files are based
+on the number of seconds since the Unix Epoch, which is Jan 1, 1970
+at 00:00:00.
+
+Since the SEASnet NFS filesystem uses unsigned 32-bit timestamps, any values
+of timestamps that are negative will be interpretted as positive values. Since
+the year 1918 is less than 1970, the unsigned version of the timestamp will
+cause the year to be shown as in the future instead of in the past.

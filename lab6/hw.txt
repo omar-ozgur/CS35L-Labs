@@ -1,0 +1,47 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 02/12/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 6 ***
+
+Homework Answers:
+
+1) Based on the method that we were using to connect over a network, data
+would first be securely transmitted by using the receiver's private key to
+encrypt a message, and the receiver would use their own public key to
+decrypt their message. Once the server and client verify each other, a
+session key agreed upon in order to speed up the encryption and decryption
+process.
+
+If someone had been observing the bytes that were transmitted across the
+network, the data would still be secure, as long as the attacker could
+not access the session key or the private keys that were used to encrypt
+or decrypt messages. The attacker could potentially see the encrypted files,
+but would not be able to view the decrypted contents.
+
+If someone was observing my team's keystrokes, they would still not be able
+to decrypt messages that were previously created for the same reasons described
+earlier. However, they would be able to monitor the contents of any new files
+that were being created based on keystrokes that were entered. However, if
+the attacker had been watching the keystrokes while passwords were initially
+being entered, they would have the information needed in order to log into
+the server themselves with a false identity, and would therefore have access
+to the files and keys stored on the server.
+
+If someone had physical control of the USB device that was used to boot the
+operating system, the network would not be secure. Since the attacker could
+potentially view all of the keys that were being used, they could encrypt or
+decrypt any files that they wanted.
+
+2) When a file is signed, the contents of the file are put through a hash
+function, and the output is signed with the creator's private key. When the
+command "gpg --verify" is run, the data is decrypted using the provided
+public key, and the the decrypted data is compared to the sent file in order
+to ensure that that the contents of the file match the signature. This does not
+verify who created the file. For example, if someone intercepted your file,
+they could change the contents of the file and re-sign the file using their
+own private key. One way to ensure that the file was actally sent by a specific
+person would be to personally ask to see that person's public key, and see if
+the key matches with the signature that matched with the sent file.

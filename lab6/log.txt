@@ -1,0 +1,97 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 02/12/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 6 ***
+
+Laboratory Log:
+
+For this laboratory assignment, my partner was Jahan Cherian.
+
+In order to begin the lab, I created a bootable USB drive for Ubuntu by
+following instructions at the following website:
+	http://www.ubuntu.com/download/desktop/create-a-usb-stick-on-mac-osx
+
+After booting up Ubuntu and opening a terminal window, I ran the following
+command in order to see if the openssh client and server programs were
+installed:
+	dpkg --get-selections | grep openssh
+
+Since the openssh-server program was not installed, I ran the following
+command to install it:
+	sudo apt-get install openssh-server
+
+In order to generate a new public and private key, I ran the following
+command:
+	ssh-keygen
+When prompted for options such as a file location to save the keys, I
+pressed "enter" in order to use the default settings. The full output is
+shown below:
+	Generating public/private rsa key pair.
+	Enter file in which to save the key (/home/ubuntu/.ssh/id_rsa):
+	Enter passphrase (empty for no passphrase):
+	Enter same passphrase again:
+	Your identification has been saved in /home/ubuntu/.ssh/id_rsa.
+	Your public key has been saved in /home/ubuntu/.ssh/id_rsa.pub.
+
+For the first part of the lab, my terminal was used as a client, and Jahan's
+terminal was used as a server.
+
+On Jahan's computer (the server), a user account was created for me by using
+the following commands:
+	sudo useradd -d /home/omar/ -m omar
+	sudo passwd omar
+	cd /home/omar
+	sudo mkdir .ssh
+This caused a username, password, and .ssh directory to be created for me
+on the server.
+
+Once my account was created, Jahan ran the following commands in order to
+give me full ownership of my account on the server:
+	sudo chown -R omar .ssh
+	sudo chmod 700 .ssh
+
+In order to find the ip address of the server, Jahan ran the command "ifconfig"
+in his terminal. This showed that the inet address was 169.232.123.73.
+
+In order to configure key-based authentication, I ran the following command
+to copy my public key to the ~/.ssh/authorized_keys directory on the server:
+	ssh-copy-id -i omar@169.232.123.73
+
+Afterwards, I added my private key to ssh-agent by running the following
+command:
+	ssh-add
+This allowed for me to log into the server without always typing my password.
+
+In order to login to the server normally, I ran the following command:
+	ssh omar@192.232.123.73
+
+In order to login to the server with X11 session forwarding, I used the -X
+option in the following command:
+	ssh -X omar@192.232.123.73
+
+After logging in with X11 session forwarding, I was able to run programs such
+as firefox and xterm, and have the GUI show on my screen.
+
+Afterwards, I began using my computer as a server, and Jahan became the client.
+
+In order to create a username, password, and .ssh directory for Jahan, I ran
+the following commands:
+	sudo useradd -d /home/jahan/ -m jahan
+	sudo passwd jahan
+	cd /home/jahan
+	sudo mkdir .ssh
+
+In order to give Jahan ownership permissions on his server folder, I ran the
+following commands:
+	sudo chown -R jahan .ssh
+	sudo chmod 700 .ssh
+
+Next, I ran "ifconfig" to find that my inet ip address was 169.232.123.100.
+
+After Jahan correctly copied his public key to my server, and saved his
+private key in ssh-agent, he was able to login to my server with the ssh
+-X option, and run programs such as firefox and xterm. The GUI's of these
+programs appeared on his computer screen, as expected.

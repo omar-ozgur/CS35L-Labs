@@ -1,0 +1,31 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 01/29/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 4 ***
+
+gitk Description:
+
+The upper-left subwindow provides information regarding past commits. For any
+given commit, this window can be used to see the commit message, as well
+as the branch that the commit was made to.
+
+The upper-middle subwindow shows the name and email address of the author
+of a commit.
+
+The upper-right subwindow gives the date and time of a commit.
+
+The middle portion that separates the top and bottom subwindows gives
+the SHA1 ID of a given commit, and displays the current row that is selected.
+There are also text fields that can be used to search for commits with
+specific properties.
+
+The bottom-left subwindow gives more detailed information about the selected
+commit, including the author, committer, parent, child, branches, follows, and
+precedes. The lower portion of the window also shows the commit's changes in
+diff format.
+
+The bottom-right subwindow lists the files that were changed due to the
+selected commit.

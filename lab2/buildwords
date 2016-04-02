@@ -1,0 +1,10 @@
+#Buildwords Lab
+
+#! /bin/bash
+
+grep -oP "(?<=<td>).*(?=<\/td>)" | \
+sed -n "n;p" | \
+sed "s/<u>//g;s/<\/u>//g" | \
+tr -s "A-Z\`, " "a-z\'\n\n" | \
+grep "^[pk'mnwlhaeiou]\{1,\}$" | \
+sort -u

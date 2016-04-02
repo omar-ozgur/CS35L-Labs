@@ -1,0 +1,198 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 02/22/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 7 ***
+
+Homework:
+
+In this homework assignment, the "sfrob.c" program from assignment 5 was
+rewritten to create a new program "sfrobu.c" based on three main changes.
+
+The first change involved replacing invokatons of "getchar()" and "putchar()"
+by "read()" and "write()" respectively in order to use unbuffered I/O. This
+change effectively increased the number of system calls that were made by the
+program. While implementing this change, the return values of the "read()" and
+"write()" commands were used to check if the end of the file had been reached
+(0 return value) or if there was an error (-1 return value).
+
+The second main change to the program was that if a regular file was used as
+input, all of the memory that was needed to save the bytes was allocated
+with one "malloc()" function call. However, if the file continued to grow,
+the program was supposed to use the original method of reading characters
+one by one. This functionality was implemented by using the "fstat()" function
+(part of the "sys/stat.h" library) to gather information about the regular
+file. The information was saved as part of a "stat" struct, which had member
+variables such as "st_mode" and "st_size" to deduce the mode and size of the
+file. Once this information was known, the size was used to allocate the
+appropriate amount of memory in my "fileString" character array, and the
+read() function was used to read and store all of the current bytes of the
+file at the same time. Afterwards, each pointer in an array of character
+pointers called "words" was made to point to the beginning of each word that
+was saved in the "fileString" array. Afterwards, the original program
+functionality (modified to use unbuffered I/O), was used to add to the "words"
+array if any new bytes were encountered in the file.
+
+The third main change was that the "sfrobu.c" program was made to print out
+the number of comparisons that were done based on invokations of the
+"frobcmp()" function. This was done by creating a global variable that was
+incremented every time "frobcmp()" was called by "qsort()".
+
+By using the "time" command, the difference in execution time between the
+programs "sfrob" and "sfrobu" could be analyzed. In order to estimate
+the number of comparisons as a function of the number of lines that were
+used as input, I created 5 files with the same 10 word phrase copied into
+10, 100, 1000, 10000, and 100000 lines. The random phrase was
+"This is a test to show the difference in time". The commands that were
+used and some output that was shown is displayed below:
+
+	(10 lines)
+
+	time ./sfrob < 10lines.txt
+	real	0m0.002s
+	user	0m0.001s
+	sys	0m0.000s
+	
+	time ./sfrobu < 10lines.txt
+	Comparisons: 487
+	real	0m0.002s
+	user	0m0.000s
+	sys	0m0.002s
+	
+	
+	(100 lines)
+	
+	time ./sfrob < 100lines.txt
+	real	0m0.002s
+	user	0m0.001s
+	sys	0m0.001s
+	
+	time ./sfrobu < 100lines.txt
+	Comparisons: 7640
+	real	0m0.003s
+	user	0m0.000s
+	sys	0m0.003s
+	
+	
+	(1000 lines)
+	
+	time ./sfrob < 1000lines.txt
+	real	0m0.010s
+	user	0m0.007s
+	sys	0m0.003s
+	
+	time ./sfrobu < 1000lines.txt
+	Comparisons: 104702
+	real	0m0.013s
+	user	0m0.004s
+	sys	0m0.008s
+	
+	
+	(10000 lines)
+	
+	time ./sfrob < 10000lines.txt
+	real	0m0.095s
+	user	0m0.076s
+	sys	0m0.012s
+	
+	time ./sfrobu < 10000lines.txt
+	Comparisons: 1331142
+	real	0m0.128s
+	user	0m0.050s
+	sys	0m0.070s
+	
+	
+	(100000 lines)
+	
+	time ./sfrob < 100000lines.txt
+	real	0m3.296s
+	user	0m0.830s
+	sys	0m0.145s
+	
+	time ./sfrobu < 100000lines.txt
+	Comparisons: 16113273
+	real	0m3.008s
+	user	0m0.582s
+	sys	0m0.719s
+
+Base on the gathered data, it can be seen that the execution times of "sfrob"
+and "sfrobu" both rose similarly when larger files were used as inputs.
+Although the full execution times were roughly the same (marked as "real" in
+the output shown above), the amount of time spent in kernel mode (marked as
+"sys" in the output shown above) was significantly higher based on "sfrobu"
+than "sfrob". This is due to the fact that kernel mode had to be used in
+order to execute system calls, which were most prevalent in the program
+version that used unbuffered I/O.
+
+In order to see the trend between larger input files and the number of
+comparisons that were made, I compiled the data in a small table shown
+below:
+
+	# lines            # comparisons
+	10                 487
+	100                7640
+	1000               104702
+	10000              1331142
+	100000             16113273
+
+By plotting the data in Microsoft Excel, I found that the the number of
+comparisons was linearly related to the number of lines in the input. The
+slope of the linear trend line was found to be approximately
+162 comparisons/line, and the R^2 value was found to be about 0.9997, showing
+that the data fell very close to this trend line. 
+
+In another part of the homework assignment, a shell script "sfrobs" was created
+to sort the encrypted files by using the standard "tr" and "sort" commands. The
+"time" command was used to record the execution times of the shell script when
+each of the 5 previously created files were used as input. These times could
+be compared to the times based on "sfrob" and "sfrobu" shown earlier in this
+document:
+
+	(10 lines)
+	
+	time ./sfrobs < 10lines.txt
+	real	0m0.005s
+	user	0m0.001s
+	sys	0m0.006s
+	
+	
+	(100 lines)
+	
+	time ./sfrobs < 100lines.txt
+	real	0m0.007s
+	user	0m0.003s
+	sys	0m0.005s
+	
+	
+	(1000 lines)
+	
+	time ./sfrobs < 1000lines.txt
+	real	0m0.018s
+	user	0m0.012s
+	sys	0m0.006s
+	
+	
+	(10000 lines)
+	
+	time ./sfrobs < 10000lines.txt
+	real	0m0.120s
+	user	0m0.112s
+	sys	0m0.016s
+	
+	
+	(100000 lines)
+	
+	time ./sfrobs < 100000lines.txt
+	real	0m3.451s
+	user	0m1.207s
+	sys	0m0.105s
+
+By comparing these recorded times to the times based on "sfrob" and "sfrobu",
+it can be seen that "sfrobs" generally takes slightly longer to run than the
+other two programs. This may be due to the fact that the shell script uses
+pipes to pass data to multiple commands, which requires the data to be input
+and output multiple times. However, the commands that were used in the script
+are likely very optimized, which keeps the execution time fairly consistent
+with the other implementations of the program.

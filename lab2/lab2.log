@@ -1,0 +1,157 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 01/15/2016
+Lab: 3
+TA: Lauren Samy
+
+*** Assignment 2 ***
+
+Laboratory Log:
+
+Before starting the lab, I ran the command "ssh ozgur@lnxsrv09.seas.ucla.edu"
+in order to login to the SEASNET linux server. I ran "export LC_ALL='C'" in
+order to use the standard C locale. To verify that the locale was correct,
+I ran the command "locale", which give the following output:
+  LANG=en_US.UTF-8
+  LC_CTYPE="C"
+  LC_NUMERIC="C"
+  ...
+  LC_ALL=C
+After ensuring that the locale was correct, I used the command
+"mkdir cs35l/hw2" to create a directory for the assignment. Afterwards,
+I ran "cd cs35l/hw2" to navigate to the working directory.
+
+In order to create the specified "words" file, I ran the command
+"sort /usr/share/dict/words > words", which sorted the words based on the
+C locale, and put the contents in a file called "words" in my working
+directory.
+
+In order to download the HTML page for the assignment, I ran the command
+"http://web.cs.ucla.edu/classes/winter16/cs35L/assign/assign2.html", which
+created the file "assign2.html" in my working directory.
+
+The command "tr -c 'A-Za-z' '[\n*]' <assign2.html" replaces all characters
+in the complement of the set 'A-Za-z' with the newline character "\n". This
+the notation "[\n*]" causes every character in the first set to be mapped
+to the same "\n" character. This causes every character that is not in the
+range "A-Z" or "a-z" to be replaced with a newline character.
+
+The command "tr -cs 'A-Za-z' '[\n*]' <assign2.html" has the same effect as
+the command described above, but includes the -s option to "squeeze" all of
+the lines together, which essentially removes all newline characters.
+
+The command "tr -cs 'A-Za-z' '[\n*]' <assign2.html | sort" has the same effect
+as the command described above, but the lines are sorted before they are
+printed.
+
+The command "tr -cs 'A-Za-z' '[\n*]' <assign2.html | sort -u" has the same
+effect as the command described above, but duplicate lines are removed before
+the lines are printed.
+
+The command "tr -cs 'A-Za-z' '[\n*]' <assign2.html | sort -u | comm - words"
+has the same effect as the command above, but the output is compared with
+the text in the "words" file. The output from this command is displayed in
+three columns. The first column includes lines unique to the output from
+command "tr -cs 'A-Za-z' '[\n*]' <assign2.html". The second column includes
+lines unique to the "words" file. The third column includes lines that 
+appear in both files. This information can be found in the "comm" manual.
+
+The "tr -cs 'A-Za-z' '[\n*]' <assign2.html | sort -u | comm -23 - words"
+command has the same effect as the command above, but uses the "-2" and
+"-3" options to suppress lines that are unique to the "words" file, as well
+as lines that are included in both file. Therefore, the command outputs
+all sorted words in the "assign2.html" file that do not appear in the "words" 
+file.
+
+In order to begin creating the Hawaiian spelling checker, I used the command
+"wget http://mauimapp.com/moolelo/hwnwdseng.htm" to make the file
+"hwnwdseng.htm", which contains the text from the given "English to Hawaiian"
+website. 
+
+#! /bin/bash
+
+grep -oP "(?<=<td>).*(?=<\/td>)" | \
+sed -n "n;p" | \
+sed "s/<u>//g;s/<\/u>//g" | \
+tr -s "A-Z\`, " "a-z\'\n\n" | \
+grep "^[pk'mnwlhaeiou]\{1,\}$" | \
+sort -u
+
+The text shown above is the "buildwords" shell script that I created to list
+all hawaiian words on a page based on a set of rules. Each line is described
+below:
+
+1) #! /bin/bash    : Allows for the script to run in the bash shell
+
+2) grep -oP "(?<=<td>).*(?=<\/td>)" | \    : Prints the words contained in the
+tags "<td>" and "</td>". The "-o" argument causes only the matching content to
+be printed, and the "-P" option allows for perl regular expressions to be used
+for the purpose of using more advanced backreferencing features.
+
+3) sed -n "n;p" | \    : Prints all odd lines (which contain the hawaiian 
+words in this case).
+
+4) sed "s/<u>//g;s/<\/u>//g" | \    : Removes all "<u>" and "</u>" tags.
+
+5) tr -s "A-Z\`, " "a-z\'\n\n" | \    : Changes all uppercase hawaiian letters
+to lower case hawaiian letters. Also changes ` to ' and changes commas and
+spaces to newline characters.
+
+6) grep "^[pk'mnwlhaeiou]\{1,\}$" | \    : Removes all words that do not 
+consist of only hawaiian characters
+
+7) sort -u    : Sorts the input, and removes duplicate lines.
+
+In order to use this "buildwords" script to create the "hwords" file, I first
+ran "chmod +x buildwords" to give execution permission for the file. Then I 
+ran "./buildwords <hwnwdseng.htm > hwords" to create the hwords file, where
+"hwnwdseng.htm" was the website that contained the English to Hawaiian
+translations.
+
+I modified an earlier command to create the Hawaiian spelling checker. By
+piping input into the following command:
+  tr "PKMNWLHAEIOU" "pkmnwlhaeiou" | tr -cs "pk\'mnwlhaeiou" "[\n*]" | sort -u | comm -23 - hwords
+I was able to output all of the words that were in the input, but were not
+included in the hawaiian dictionary.
+
+In order to check my work, I ran the following command in order to check the
+misspelled words on the assignment webpage:
+  tr "PKMNWLHAEIOU" "pkmnwlhaeiou" <assign2.html | tr -cs "pk\'mnwlhaeiou" "[\n*]" | sort -u | comm -23 - hwords
+The output of this command showed numerous lines of words such as "who" and
+"name" that were not included in the "hwords" file.
+
+In order to further check my work, I ran the following command in order to 
+check spelling checker against itself:
+  tr "PKMNWLHAEIOU" "pkmnwlhaeiou" <hwords | tr -cs "pk\'mnwlhaeiou" "[\n*]" | sort -u | comm -23 - hwords
+There was no output after running the command, indicating that all 
+hawaiian words in the "hwords" file passed the spelling check.
+
+In order to count the number of "misspelled" English words on the assignment
+page, I used the following command:
+  tr -cs 'A-Za-z' '[\n*]' <assign2.html | sort -u | comm -23 - words | wc -l
+The output was "81", which indicates that there were 81 "misspelled" English
+words on the web page.
+
+In order to count the number of "misspelled" Hawaiian words on the assignment
+page, I used the following command:
+  tr "PKMNWLHAEIOU" "pkmnwlhaeiou" <assign2.html | tr -cs "pk\'mnwlhaeiou" "[\n*]" | sort -u | comm -23 - hwords | wc -l
+The output was "198", which indicates that there were 198 "misspelled"
+Hawaiian words on the web page.
+
+In order to find the words on the web page that were "misspelled" as English,
+but not Hawaiian, I ran the following commands:
+  tr -cs 'A-Za-z' '[\n*]' <assign2.html | sort -u | comm -23 - words > listE
+  tr "PKMNWLHAEIOU" "pkmnwlhaeiou" <assign2.html | tr -cs "pk\'mnwlhaeiou" "[\n*]" | sort -u | comm -23 - hwords > listH
+  comm -23 listE listH
+These commands gave 75 results, indicating that there were many words that
+were "misspelled" as English, but not as Hawaiian. Some examples include
+"html", "charset", and "opengroup".
+
+In order to find the words on the web page that were "misspelled" as Hawaiian,
+but not English, I ran the following commands:
+  tr -cs 'A-Za-z' '[\n*]' <assign2.html | sort -u | comm -23 - words > listE
+  tr "PKMNWLHAEIOU" "pkmnwlhaeiou" <assign2.html | tr -cs "pk\'mnwlhaeiou" "[\n*]" | sort -u | comm -23 - hwords > listH
+  comm -13 listE listH
+These commands gave 192 results, indicating that there were many words that
+were "misspelled" as Hawaiian, but not English. Some examples include "who",
+"mail", and "amp".

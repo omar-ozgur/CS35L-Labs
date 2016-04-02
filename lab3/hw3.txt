@@ -1,0 +1,51 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 01/22/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 3 ***
+
+Homework Answers:
+
+3: When the command "./randline.py /dev/null" is executed, the following
+traceback is shown:
+  File "./randline.py", line 70, in <module>
+    main()
+  File "./randline.py", line 64, in main
+    sys.stdout.write(generator.chooseline())
+  File "./randline.py", line 34, in chooseline
+    return random.choice(self.lines)
+  File "/usr/lib64/python2.7/random.py", line 274, in choice
+    return seq[int(self.random() * len(seq))]  # raises IndexError if seq is
+empty
+  IndexError: list index out of range
+
+The "choice()" function that is called in line 34 of "randline.py" is found on
+line 272 of file "/usr/lib64/python2.7/random.py". The function takes an
+argument "seq" which is the sequence of lines that can be picked from, in
+the form of an array.
+
+In the "choice" function, a random number is multiplied by "seq". The result
+is cast as an integer, and used to access an element of array "seq" at that
+calculated index. If an empty file was used, len(seq) is equal to 0, causing
+the function to try to access element "0" of an empty array, which causes
+the program to raise an "IndexError".
+
+
+4: If the script is run with Python 3 by using the command
+ "python3 randline.py test.txt", the following error is shown:
+  File "randline.py", line 65
+    except IOError as (errno, strerror):
+                      ^
+  SyntaxError: invalid syntax
+
+This error is due to the fact that Python 3 no longer supports tuple unpacking
+of exception parameters, and now requires properties of an exception object to
+be explicitly unpacked. This is partically because it is burdensome on many
+systems to analyze the implicitly unpacked parameters.
+
+A proper way to fix the problem would be to replace line 65 with the following:
+  except IOError as err:
+    errno = e.errno
+    sterror = e.sterror

@@ -1,0 +1,83 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 02/26/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 8 ***
+
+Laboratory Log:
+
+In order to begin this lab, I logged onto a UCLA SEASnet server with the
+following command:
+	ssh ozgur@lnxsrv09.seas.ucla.edu
+
+Next, I ran the "$PATH" command in order to ensure that the path
+"/usr/local/cs/bin" was set as an environment variable.
+
+Afterwards, I ran the command "sort --version" in order to ensure that my
+version of coreutils was up-to-date. The first line of the output showed
+that my coreutils version was 8.25, which is newer than 8.6, showing that
+coreutils did not need to be updated.
+
+In order to create a file with 10,000,000 random double-precision floating
+point numbers on separate lines, and pipe the output into a file called
+"10M.txt", I ran the following command:
+	od -t f -N 80000000 < /dev/urandom | sed 's/^[0-7]* *//' |\
+tr -s ' ' '\n' > 10M.txt
+
+The "od" command used the "-t" option to specify the floating point type. The
+"-N" option was used to limit the output to 80,000,000 bytes, which is
+equivalent to 10,000,000 double-precision floating point numbers.
+
+The "sed" command was used to remove the addresses at the beginning of each
+line.
+
+The "tr" command was used to replace all spaces with newline characters, and
+the "-s" option was used to "squeeze" the output so that all empty lines
+were removed.
+
+After creating the file "10M.txt" containing 10,000,000 floating point numbers,
+I used the "time" command to record that it took to sort the file. The output
+was redirected to the "/dev/null" file. In the first trial, only the "-g"
+option was specified in order to specifiy sorting by general numerical value.
+In the next 4 trials, the "-g" option was specified, along with the
+"--parallel=N" option where N = 1, 2, 3, or 4 in order to test timing with the
+specified number of threads. The commands and the outputs are displayed below: 
+
+	time -p sort -g < 10M.txt > /dev/null
+	real 34.96
+	user 194.49
+	sys 0.55
+
+	time -p sort -g --parallel=1 < 10M.txt > /dev/null	
+	real 180.74
+	user 180.50
+	sys 0.23
+
+	time -p sort -g --parallel=2 < 10M.txt > /dev/null
+	real 94.18
+	user 180.32
+	sys 0.28
+
+	time -p sort -g --parallel=4 < 10M.txt > /dev/null
+	real 56.61
+	user 190.15
+	sys 0.38
+
+	time -p sort -g --parallel=8 < 10M.txt > /dev/null
+	real 35.27
+	user 195.15
+	sys 0.54
+
+As could be seen, the sorting time reduced noticeably when more threads were
+utilized. This is due to the fact that the more operations could be done at the
+same time in separate threads. When the "--parallel=N" option was not specified,
+the execution time was approximately the same as when 8 threads were being used,
+which is due to the fact that the sort command automatically sets "N" to the
+number of processors, but limits it to 8.
+
+By analyzing the recorded times in each of the 5 trials, it could be seen that
+the "sys" time increased when the number of threads was increased. This makes
+sense due to the fact that system calls had to be used in order to allocate
+resources for each thread.

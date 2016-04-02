@@ -1,0 +1,45 @@
+#sameln hw
+
+#! /bin/bash
+
+dir=$1
+RESULT=`ls -a $dir | sort`
+IFS=$'\n'
+declare -a ARRAY # Stores all words that don't begin with "."
+declare -a DOTARRAY # Stores all words that begin with "."
+let count=0
+let dotCount=0
+for FILE in $RESULT
+do
+	if [ ! -r "$dir/$FILE" ] # Check if the file is not readable
+	then
+		echo "Error reading file $dir/$FILE"
+	fi
+	if [[ ! -L "$dir/$FILE" && -r "$dir/$FILE" && -f "$dir/$FILE" ]] # Check if the file is not a symbolic link, and is readable, and is a regular file
+	then
+		if [ "${FILE:0:1}" == "." ] # If a file name begins with ".", place it in a separate array
+		then
+			DOTARRAY[$dotCount]="$dir/$FILE"
+			let dotCount=dotCount+1
+		else
+			ARRAY[$count]="$dir/$FILE"
+			let count=count+1
+		fi
+	fi
+done
+exec 2>/dev/null
+ARRAY=("${DOTARRAY[@]}" "${ARRAY[@]}") # Concatenate the two ararys
+let count=count+dotCount
+for (( i=0; i<$count; i++ ))
+do
+	for (( j=$i+1; j<$count; j++ ))
+	do
+		if [[ -s "${ARRAY[$i]}" && -s "${ARRAY[$j]}" || ! -s "${ARRAY[$i]}" && ! -s "${ARRAY[$j]}" ]] # Check that both files are empty or both files are not empty
+		then
+			if [[ ! $(cmp "${ARRAY[$i]}" "${ARRAY[$j]}") ]] # Compare the contents of two files, and create a hard-link if they are duplicates
+			then
+				ln -f "${ARRAY[$i]}" "${ARRAY[$j]}"
+			fi
+		fi
+	done
+done

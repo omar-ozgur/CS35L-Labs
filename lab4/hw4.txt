@@ -1,0 +1,121 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 01/29/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 4 ***
+
+Homework Log:
+
+1)
+In order to begin the homework assignment, I logged into a SEASNET server with
+the following command:
+	ssh ozgur@lnxsrv.seas.ucla.edu
+
+Next, I navigated to my "Diffutils" directory with the following command:
+	cd cs35l/hw4/diffutils
+
+2)
+In order to check out version 3.0 of the program to a branch called "quote", I
+ran the following command:
+	git checkout v3.0 -b quote
+
+3)
+In order to apply the patch from file "quote-3.0-patch.txt", I ran the
+following command:
+	patch -p1 <../quote-3.0-patch.txt
+
+4)
+Based on the Emacs documentation, the Emacs command "add-change-log-entry-other
+-window" (C-x 4 a) can be used to add a ChangeLog entry for the currently
+opened file.
+
+5)
+In order to get a list of the modified files, I ran the following command:
+	git status
+
+A portion of the output is listed below:
+	modified:   src/cmp.c
+	modified:   src/diff.c
+	modified:   src/diff3.c
+	modified:   src/dir.c
+	modified:   src/sdiff.c
+	modified:   src/util.c
+
+For each of these files, I ran the following commands in order to create a
+ChangeLog entry:
+	emacs <file name>
+	C-x 4 a
+	* Typed message: "Changed grave accents to apostrophes" *
+	C-x C-c y
+
+After using the commands listed above to create ChangeLog entries for all
+of the modified files, I used "cat ChangeLog" and "cat ChangeLog-2008" in
+order to ensure that the formating of the ChangeLog entries was the same.
+
+6)
+In order to create a new commit, with the ChangeLog file as the commit message,
+I ran the following commands:
+	git add .
+	git commit -F ChangeLog
+
+7)
+In order to generate a new patch in a file called "formatted-patch.txt", I ran
+the following command:
+	git format-patch -1 --stdout >formatted-patch.txt
+
+8)
+For this step of the homework, my partner was Jahan Cherian.
+In order to swap patch files with Jahan, I first used the following command to
+move my patch file from the linux server to my local desktop:
+	cp ozgur@lnxsrv01.seas.ucla.edu:~/cs35l/lab4/formatted-patch.txt \
+formatted-patch.txt
+
+After swapping patch files with my partner, I copied Jahan's patch file to the
+linux server with the following command:
+	scp formatted-patch.txt \
+ozgur@lnxsrv01.seas.ucla.edu:~/cs35l/lab4/formatted-patch-partner.txt
+
+In order to test Jahan's patch, I used "cd diffutils" in order to enter the
+project directory, and then I ran the following commands:
+	git checkout v3.0 -b partner
+	git am <../formatted-patch-partner.txt
+	./bootstrap
+	./configure
+	make
+	make check
+
+9)
+To view my partner's ChangeLog file, I ran the following commands:
+	make distdir
+	cat diffutils-3.0.1-af08/ChangeLog
+
+After inspecting the ChangeLog based on my partner's patch, I found that
+everything was applied properly as expected.
+
+In order to test that my patch worked as well, I ran the following commands:
+	git add .
+	git commit -m "Applied partner's patch"
+	git checkout quote
+	make distdir
+	cat diffutils-3.0.1-c63e/ChangeLog
+
+Based on the ChangeLog output, I found that my patch was applied properly as
+well.
+
+10)
+In order to prepare to run "gitk" on the GNU Emacs git repository, I logged out
+of the linux server, and installed XQuartz on my mac. Then I re-logged into the
+linux server with the following command:
+	ssh -X ozgur@lnxsrv01.seas.ucla.edu
+
+I then downloaded a copy of the GNU Emacs git repository to my home directory
+by running the following command:
+	git clone git://git.savannah.gnu.org/emacs.git
+
+After the repository was downloaded, I used the command "cd emacs" to enter the
+main directory, and used the command "gitk", which opened a window that had
+detailed information about the history of the commits for that repository. A
+screenshot of the window, as well as a description of the functions of the
+subwindows, is provided in the assignment submission.

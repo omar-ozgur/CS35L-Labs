@@ -1,0 +1,217 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 01/29/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 4 ***
+
+Laboratory Log:
+
+1)
+In order to begin the lab assignment, I logged into a SEASNET server with the
+following command:
+	ssh ozgur@lnxsrv09.seas.ucla.edu
+
+Next, I created a working directory for the assignment, and entered it, with
+the following commands:
+	cd cs35l
+	mkdir hw4
+	cd hw4
+
+Afterwards, I cloned the specified git repository into my working directory,
+and entered the directory, by using the following commands:
+	git clone git://git.savannah.gnu.org/diffutils.git
+	cd diffutils
+
+2/3)
+Next, I saved the git logs and tags into files names "git-log" and
+"git-tags" respectively by using the following commands:
+	git log >git-log.txt
+	git tag >git-tags.txt
+
+4)
+In order to find the specified commit ID, I opened the "git-log.txt" file
+in vim, and searched for the words "maint: quote", by using the following
+commands:
+	vim git-log.txt
+	/maint: quote
+
+After running these commands, I found that the desired commit ID was
+"62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f".
+
+In order to generate the desired patch, and save it in a file called
+"quote-patch.txt", I ran the following command:
+	git show 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f >quote-patch.txt
+
+5)
+In order to check out version 3.0 from the repository, I first checked
+the specified tags with the following command:
+	cat git-tags.txt
+
+In order to check out the commit with tag "v3.0", I ran the following
+command:
+	git checkout v3.0
+
+6)
+Before using "quote-patch.txt" to patch the program, I ran
+"cat quote-patch.txt" in order to see the expected directory format. Based on
+the output, I found that the appropriate patch option would be "-p1". Next, I
+ran the following command to apply the patch:
+	patch -p1 <quote-patch.txt
+
+7)
+In order to get an overview of what happened, I ran the following command:
+	git status
+
+The status output gave a list of 21 files that were modified, as well as many
+files that were untracked in the project. A portion of the output is shown
+below:
+	# HEAD detached at v3.0
+	# Changes not staged for commit:
+	#   (use "git add <file>..." to update what will be committed)
+	#   (use "git checkout -- <file>..." to discard changes in working 
+	directory)
+	#
+	#       modified:   NEWS
+	#       modified:   README
+	...
+	#       modified:   tests/help-version
+	#
+	# Untracked files:
+	#   (use "git add <file>..." to include in what will be committed)
+	#
+	#       NEWS.orig
+	#       README-hacking.orig
+	...
+
+8)
+Before reverting specific changes, I found the following information about
+some useful Emacs commands:
+	vc-diff: Shows the changes that were made to a file based on the
+	previous version.
+	
+	vc-revert: Reverts changes that were made to a file based on the
+	previous version.
+	
+	(In the *vc-diff* buffer)
+	diff-apply-hunk: Applies a specific change to a file. Can also be
+	used with C-u in order to revert a specific hunk
+	
+	diff-goto-source: Goes to the source file and line corresponding
+	to a hunk
+
+9)
+For each modified file that was shown based on "git status", I opened the file
+in emacs, and used the vc-diff (C-x v =) in order to show the changes that were
+made. If the file extension was not ".c", I used vc-revert (C-x v u) to revert
+all of the changes that were made to that file.
+
+If a file's extension was ".c", I manually inspected each hunk. If a change
+was made to a comment, I used the reverse of diff-apply-hunk (C-u C-c C-a) in
+order to revert that specific change.
+
+Some examples of the commands that were used to edit files are shown below:
+	emacs NEWS
+	C-x v =
+	C-x v u
+	y e s Enter
+	C-x C-c
+
+	emacs src/analyze.c
+	C-x v =
+	C-u C-c C-a (3 times)
+	(Move mouse to @ sign of something you want to revert)
+	C-x C-c y
+
+10)
+In order to apply the rejected changes from files "diff.c.rej" and
+"diff3.c.rej", I manually inspected the files and made the corresponding
+changes in files "diff.c" and "diff3.c" respectively. This was a bit difficult
+because the lines contents and numbers did not match perfectly between the
+files. Due to this, I opened a ".c.rej" file along with its corresponding
+".c" file, and manually changed grave accents to apostrophes in the lines that
+corresponded to those in the ".c.rej" file. I repeated this for both pairs
+of files.
+
+11)
+Before removing untracked files, I moved the files "git-log", "git-tags", and
+"quote-patch" to an external file so that they would be preserved.
+
+In order to remove untracked files that "git status" warns about, I used the
+following command:
+	git clean -f
+
+12)
+After running "git status" once again, I found that only 6 files were shown
+to be modified, which was expected.
+
+In order to show the changes that were made to the files in the repository
+based on the previous version, I ran the following command:
+	git diff
+This gave 326 lines of output in the format of a patch file.
+
+In order to save the output in a patch file called "quote-3.0-patch.txt", I
+ran the following command:
+	git diff >quote-3.0-patch.txt
+
+Afterwards, I moved the "quote-3.0-patch.txt" file to an external directory
+in order to save it in a secure place.
+
+13)
+Before building the "diff" executable, I used the "exit" command to logout of
+the SEASNET server. I re-logged into the SEASNET linux server 01 in order to
+use an old version of glibc, which allows for the use of the "gets" function.
+
+Next, I used the following command to view instructions about building the
+Diffutils project:
+	cat README-hacking
+
+Based on the instructions in the README-hacking file, I ran the following
+commands to build the project:
+	./bootstrap
+	./configure
+	make
+	make check
+
+14)
+After running the command "src/diff . -", I received the following output,
+which was expected:
+	diff: cannot compare '-' to a directory
+
+After running the command "src/diff --help", the correct help information was
+shown, with grave accents replaced with apostrophes.
+
+In order to remove the untracked files once again, I ran the following command:
+	git clean -f
+
+In order to save the project's src files in a file called
+"diffutils-3.0-patch", I navigated to the project's parent directory, and ran
+the following command:
+	cp -r diffutils/src diffutils-3.0-patch
+
+In order to save the project's original version 3.0 src files, I re-entered
+the project directory. I used "git add" and "git commit" to create a new
+commit based on the patch that was applied. I used "git log" to find the
+commit ID based on the new patch, and used "git branch" to save the patched
+version of the project in a new branch. I then used "git checkout" to get
+version 3.0 of the project. The detailed commands are all listed below:
+	cd diffutils
+	git add .
+	git commit -m "Applied patch v3.0"
+	git log
+	git branch patch 590984f
+	git checkout v3.0
+	cd ..
+	cp -r diffutils/src diffutils-3.0
+	diffutils-3.0-patch/diff -pru diffutils-3.0 diffutils-3.0-patch \
+>quote-3.0-test.txt
+
+15)
+In order to compare the files "quote-3.0-test.txt" and "quote-3.0-patch.txt",
+I used the following command:
+	diff quote-3.0-test.txt quote-3.0-patch.txt
+
+Based on the output of the previous command, the files are not identical. They
+are innocuous though because the changes from grave accents to apostrophes
+only alter the strings that are printed out.

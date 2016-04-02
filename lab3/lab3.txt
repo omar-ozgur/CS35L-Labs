@@ -1,0 +1,242 @@
+Name: Omar Ozgur
+ID: 704465898
+Date: 01/22/2016
+Lab Section: 3
+TA: Lauren Samy
+
+*** Assignment 3 ***
+
+Laboratory Log:
+
+In order to begin the laboratory assignment, I downloaded the "Coreutils 7.6"
+program by running the following command:
+  wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+this stored the file "coreutils-7.6.tar.gz" in my home directory.
+
+In order to unzip the file, I ran the following command:
+  tar -xvzf coreutils-7.6.tar.gz
+This extracted the files from the zipped tar file to the directory 
+"Coreutils-7.6". In the "tar" command, option "-x" indicates that the contents
+should be extracted. Option "-v" indicates that verbose output should be
+displayed. Option "-z" indicates the use of gzip to unzip the archive. And
+option "-f" indicates allows for the name of the archive to be specified.
+
+In order to begin compiling and installing Coreutils, I created a new directory
+by running the following command:
+  mkdir ~/coreutils
+This created the directory "coreutils" in my home directory.
+
+After creating the "coreutils" directory, I navigated to the "Coreutils-7.6"
+directory by using the following command:
+  cd ~/Coreutils-7.6
+
+In order to read more about the "coreutils" program, I used the following
+commands to read the README and INSTALL files that were provided:
+  cat README
+  cat INSTALL
+In the "INSTALL" file, I found that the "configure" executable could be run
+with the "--prefix" option in order to specify the install directory of the
+program with an absolute path.
+
+In order to find the absolute path of the "~/coreutils" directory, I used the
+following command:
+  readlink -f ~/coreutils
+This command printed the output "/w/home.07/cs/ugrad/ozgur/coreutils", which is
+the absolute path that I was looking for. Therefore, a proper Makefile for the
+program was created by running the following command:
+  ./configure --prefix=/w/home.07/cs/ugrad/ozgur/coreutils
+
+In order to actually compile the program I ran the following command:
+  make
+
+In order to install the program in the "~/coreutils" folder, I ran the
+following command:
+  make install
+
+In order to reproduce the specified bug with the unmodified version of
+coreutils, I navigated to the location of the newly created "ls" executable
+with the following command:
+  cd ~/coreutils/bin
+To reproduce the bug, I first ran the following commands to test the output
+of the "ls" executable in the "C" locale:
+  export LC_ALL='C'
+  ./ls -l
+An example of the output that was displayed is shown below:
+  -rwxr-xr-x 1 ozgur csugrad 128182 Jan 19 15:41 [
+  -rwxr-xr-x 1 ozgur csugrad 119873 Jan 19 15:41 base64
+  ...
+  -rwxr-xr-x 1 ozgur csugrad  85634 Jan 19 15:41 yes
+As can be seen, the date is shown in traditional Unix format.
+
+Next, I ran the following commands to test the outpus of the "ls" executable
+in the "en_US.UTF-8" locale:
+  export LC_ALL='en_US.UTF-8'
+  ./ls -l
+An example of the output that was displayed is shown below:
+  -rwxr-xr-x 1 ozgur csugrad 128182 2016-01-19 15:41 [
+  -rwxr-xr-x 1 ozgur csugrad 119873 2016-01-19 15:41 base64
+  ...
+  -rwxr-xr-x 1 ozgur csugrad  85634 2016-01-19 15:41 yes
+As can be seen, the date is shown in the YYYY-MM-DD format, which is not
+desireable.
+
+In order to apply the patch, I first navigated to the given webpage that
+included Pádraig Brady's patch. I then navigated to the "~/coreutils-7.6"
+directory with the following command:
+  cd ~/coreutils-7.6
+Next, I used the following command to open a new file called "patch.diff"
+in the vim text editor:
+  vim patch.diff
+Next, I copied the patch from the website, and I used the ":set paste" option
+in vim to allow for proper pasting from the clipboard. I then typed "a" to
+insert text after the cursor's position, and used "Cmd-v" to paste the patch
+into the file.
+
+In order to apply the patch from the "patch.diff" file, I opened the manual
+page for the "patch" command by using the following command:
+  man patch
+In the manual page, I found that the option -pnum was used to strip the
+specified number of leading slashes from the given file names. By using "-p1",
+the correct number of slashes were removed so that the file names in the
+diff file corresponded with the file names in my directory.
+Based on this information, I used the following command to apply the patch:
+  patch -p1 <patch.diff
+After running the command, I received the following output, which
+indicated that the patch was applied successfully:
+  patching file NEWS
+  Hunk #1 succeeded at 397 with fuzz 2 (offset 365 lines).
+  patching file src/ls.c
+  Hunk #1 succeeded at 2013 (offset -1 lines).
+  Hunk #2 succeeded at 2028 (offset -1 lines).
+
+In order to compile the program once again, I used the following command:
+  make
+After running the command, many "make" commands were shown to be executed
+in the terminal. The full output is shown below:
+  make  all-recursive
+  make[1]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6'
+  Making all in lib
+  make[2]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/lib'
+  make  all-recursive
+  make[3]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/lib'
+  make[4]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/lib'
+  make[4]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/lib'
+  make[3]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/lib'
+  make[2]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/lib'
+  Making all in src
+  make[2]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/src'
+  make  all-am
+  make[3]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/src'
+    CC     ls.o
+    CCLD   dir
+    CCLD   vdir
+    CCLD   ls
+  make[3]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/src'
+  make[2]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/src'
+  Making all in doc
+  make[2]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/doc'
+  make[2]: Nothing to be done for 'all'.
+  make[2]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/doc'
+  Making all in man
+  make[2]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/man'
+    GEN    dir.1
+    GEN    vdir.1
+    GEN    ls.1
+  make[2]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/man'
+  Making all in po
+  make[2]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/po'
+  make[2]: Nothing to be done for 'all'.
+  make[2]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/po'
+  Making all in tests
+  make[2]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/tests'
+  make[2]: Nothing to be done for 'all'.
+  make[2]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/tests'
+  Making all in gnulib-tests
+  make[2]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/gnulib-
+tests'
+  make  all-recursive
+  make[3]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/gnulib-
+tests'
+  make[4]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/gnulib-
+tests'
+  make[4]: Nothing to be done for 'all-am'.
+  make[4]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/gnulib-
+tests'
+  make[3]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/gnulib-
+tests'
+  make[2]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6/gnulib-
+tests'
+  make[2]: Entering directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6'
+  make[2]: Nothing to be done for 'all-am'.
+  make[2]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6'
+  make[1]: Leaving directory '/w/home.07/cs/ugrad/ozgur/coreutils-7.6'
+
+The command "make all-recursive" caused make to "enter" each pre-specified
+directory in order to check if files needed to be recompiled. The only
+folders that contained files that needed to be recompiled were "src" and
+"man". Although nothing else needed to be recompiled, it was important to
+have make check each folder in order to check that the timestamps of files
+were the same as they were previously. By allowing "make" to run recursively
+through all of the directories in the project, large projects can be compiled
+without manually keeping track of files. This may cause unnecessary checks
+to be run, but this saves a lot of time and effort.
+
+After compiling the new version of "ls", I created two files called "new.txt"
+and "old.txt" in the home directory by using the following commands:
+  touch ~/new.txt
+  touch -d "1 year ago" ~/old.txt
+The second command uses the -d option in order to artificially make the file
+at least 1 year old.
+
+In order to test that the old version of "ls" doesn't work, I navigated to my
+home directory with "cd", and then I ran the following commands:
+  export LC_ALL='C'
+  ./coreutils/bin/ls -l
+This gave the following output:
+  -rw-r--r--  1 ozgur csugrad        0 Jan 21 14:45 new.txt
+  -rw-r--r--  1 ozgur csugrad        0 Jan 21  2015 old.txt
+The output was correct in the "C" locale. To test in the en_US.UTF-8 locale, I
+used the following commands:
+  export LC_ALL='en_US.UTF-8'
+  ./coreutils/bin/ls -l
+This gave the following output:
+  -rw-r--r--  1 ozgur csugrad        0 2016-01-21 14:45 new.txt
+  -rw-r--r--  1 ozgur csugrad        0 2015-01-21 14:49 old.txt
+This shows that the old version of "ls" that was installed still has the bug.
+
+In order to test that the new version works, I first used the following
+commands to test "ls" in the "C" locale:
+  export LC_ALL='C'
+  ./coreutils-7.6/src/ls -l
+This gave the following output for the two files:
+  -rw-r--r--  1 ozgur csugrad        0 Jan 21 14:45 new.txt
+  -rw-r--r--  1 ozgur csugrad        0 Jan 21  2015 old.txt
+This was the correct output, as expected. In order to test that "ls" works in
+the en_US.UTF-8 locale, I used the following commands:
+  export LC_ALL='en_US.UTF-8'
+  ./coreutils-7.6/src/ls -l
+This gave the following output:
+  -rw-r--r--  1 ozgur csugrad        0 Jan 21 14:45 new.txt
+  -rw-r--r--  1 ozgur csugrad        0 Jan 21  2015 old.txt
+Again, the output was correct, indicating that the bug was fixed based on the
+specified test cases.
+
+Answers to Lab Questions:
+
+1: The line "case_long_iso_time_style:" was removed because it was no longer
+required after also removing the line "goto case_long_iso_time_style;". The
+ line "goto case_long_iso_time_style;" was the only line that called
+"case_long_iso_time_style:". It was not necessary to remove the
+line because any time that the case above it was called, the body of the
+case would be executed, and the deleted line would have just been ignored.
+
+2: If my company were to switch to this patched version of Coreutils, I would
+need to watch out for cases in which this is not compatible with previously
+created programs, as well as for cases where users don't understand English or
+English-format dates. 
+If a previously created program relied on the format of "ls" output in order to
+parse data, the new formats for certain locales could alter the results of the
+parsing.
+Since the altered program causes many locales to use English month names and 
+English-format dates, it may be difficult for some users to understand the
+output of "ls".
